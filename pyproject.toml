@@ -7,7 +7,8 @@ package-mode = false
 
 [tool.poetry.dependencies]
 python = ">=3.11"
-pacer-client = "1.2.0rc1"
+alfalfa-client = "1.0.0"
+#pacer-client = "1.2.0rc1"
 jupyterlab = "^4.0"
 
 [tool.poetry.group.dev.dependencies]
