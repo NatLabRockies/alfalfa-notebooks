@@ -1,18 +1,19 @@
 [tool.poetry]
-name = "cctwin"
-version = "0.0.1"
-description = ""
-authors = ["Anya Petersen <anya.petersen@nrel.gov>"]
+name = "pacer-notebooks"
+version = "1.0.0"
+description = "Introductory Jupyter notebooks for interacting with a PACER (formerly Alfalfa) web service via the pacer-client Python library."
+authors = ["Anya Petersen <anya.petersen@nlr.gov>", "Nicholas Long <nicholas.long@nlr.gov>"]
+package-mode = false
 
 [tool.poetry.dependencies]
-python = "^3.7.1"
-# update this after release
-#alfalfa-client = "0.1.0.dev7"
-alfalfa-client = "~0.3.1"
-jupyterlab = "^3.0.17"
+python = ">=3.11"
+alfalfa-client = "1.0.0"
+#pacer-client = "1.2.0rc1"
+jupyterlab = "^4.0"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^4.0.1"
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
+requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
