@@ -1,3 +1,5 @@
 .DS_Store
 poetry.lock
 .ipynb_checkpoints/*
+.python-version
+__pycache__/
