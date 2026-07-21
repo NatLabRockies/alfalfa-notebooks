@@ -1,0 +1,32 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-added-large-files
+        args: ['--maxkb=2000']
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: check-toml
+      - id: check-yaml
+      - id: check-json
+      - id: check-merge-conflict
+      - id: mixed-line-ending
+      - id: pretty-format-json
+        args: ['--autofix', '--no-sort-keys']
+        exclude: \.ipynb$
+  - repo: https://github.com/kynan/nbstripout
+    rev: 0.9.1
+    hooks:
+      - id: nbstripout
+  - repo: local
+    hooks:
+      - id: remove-version-metadata
+        name: remove version metadata from ipynb files
+        entry: python .pre-commit/remove_kernelspec.py
+        language: system
+        types: [jupyter]
+      - id: format-geojson-files
+        name: sort the elements in the geojson file
+        entry: python .pre-commit/format_geojson.py
+        language: system
+        files: \.geojson$
