@@ -1,5 +1,5 @@
 # Alfalfa Notebooks
-The Alfalfa Notebooks repository is a collection of introductory jupyter notebooks for how to interact with an [Alfalfa](https://github.com/nrel/alfalfa) instance via the [alfalfa-client](https://github.com/nrel/alfalfa-client) python library.
+The Alfalfa Notebooks repository is a collection of introductory jupyter notebooks for how to interact with an [Alfalfa](https://github.com/nrel/alfalfa) instance via the [pacer-client](https://github.com/nrel/alfalfa-client) python library.
 
 ## Setup
 1. Download this repository and save it to a folder on your computer.
