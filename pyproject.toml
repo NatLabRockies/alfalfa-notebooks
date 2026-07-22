@@ -1,14 +1,13 @@
 [tool.poetry]
-name = "pacer-notebooks"
+name = "alfalfa-notebooks"
 version = "1.0.0"
-description = "Introductory Jupyter notebooks for interacting with a PACER (formerly Alfalfa) web service via the pacer-client Python library."
+description = "Introductory Jupyter notebooks for interacting with an Alfalfa web service via the alfalfa-client Python library."
 authors = ["Anya Petersen <anya.petersen@nlr.gov>", "Nicholas Long <nicholas.long@nlr.gov>"]
 package-mode = false
 
 [tool.poetry.dependencies]
 python = ">=3.11"
 alfalfa-client = "1.0.0"
-#pacer-client = "1.2.0rc1"
 jupyterlab = "^4.0"
 
 [tool.poetry.group.dev.dependencies]
