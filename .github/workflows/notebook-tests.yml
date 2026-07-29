@@ -1,0 +1,82 @@
+name: Notebook Tests
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  aries-thermal-assets:
+    name: Run aries_thermal_assets.ipynb against Alfalfa (develop)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+
+      - name: Install Poetry
+        run: pipx install poetry
+
+      - name: Install dependencies
+        run: poetry install --no-interaction
+
+      - name: Start Alfalfa (ghcr develop images)
+        uses: NatLabRockies/alfalfa-action@v1
+        with:
+          tag: develop
+          compose-file-ref: develop
+          worker-scale: 2
+
+      - name: Wait for Alfalfa web API
+        uses: iFaxity/wait-on-action@v1.2.1
+        with:
+          resource: http://localhost
+
+      # The bundled Boiler_EC.fmu / BuriedPipePair_FMU.fmu are compiled with
+      # the CVODE (SUNDIALS BDF implicit) solver, but the published Alfalfa
+      # worker image does not ship libsundials_{nvecserial,cvode}.so.5 (see
+      # the Troubleshooting note in aries_thermal_assets.ipynb). Debian's
+      # apt packages only provide the incompatible .so.6 ABI, so pull the
+      # matching .so.5 build straight from the OpenModelica base image that
+      # FMU-compilation-workbench compiles against (same SUNDIALS 5.4.0
+      # build the FMUs were linked against) and drop it into each worker.
+      - name: Patch Alfalfa workers with SUNDIALS runtime libraries
+        run: |
+          docker pull --platform linux/amd64 openmodelica/openmodelica:v1.26.3-ompython
+          cid=$(docker create --platform linux/amd64 openmodelica/openmodelica:v1.26.3-ompython)
+          mkdir -p /tmp/sundials-libs
+          docker cp -L "$cid:/usr/lib/x86_64-linux-gnu/omc/libsundials_nvecserial.so.5" /tmp/sundials-libs/
+          docker cp -L "$cid:/usr/lib/x86_64-linux-gnu/omc/libsundials_cvode.so.5" /tmp/sundials-libs/
+          docker rm "$cid"
+          for worker in alfalfa-worker-1 alfalfa-worker-2; do
+            docker cp /tmp/sundials-libs/libsundials_nvecserial.so.5 "$worker":/usr/local/lib/
+            docker cp /tmp/sundials-libs/libsundials_cvode.so.5 "$worker":/usr/local/lib/
+            docker exec "$worker" ldconfig
+          done
+
+      - name: Dump docker logs before test
+        uses: jwalton/gh-docker-logs@v2
+
+      - name: Execute aries_thermal_assets.ipynb
+        run: |
+          poetry run jupyter nbconvert --to notebook --execute aries_thermal_assets.ipynb \
+            --output executed_aries_thermal_assets.ipynb \
+            --ExecutePreprocessor.timeout=600
+
+      - name: Upload executed notebook
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: executed-aries-thermal-assets-notebook
+          path: executed_aries_thermal_assets.ipynb
+
+      - name: Dump docker logs on failure
+        if: failure()
+        uses: jwalton/gh-docker-logs@v2
