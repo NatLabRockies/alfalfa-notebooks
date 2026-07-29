@@ -8,7 +8,8 @@ on:
 
 jobs:
   aries-thermal-assets:
-    name: Run aries_thermal_assets.ipynb against Alfalfa (develop)
+    # TODO: revert to "Alfalfa (develop)" once alfalfa#631 merges.
+    name: Run aries_thermal_assets.ipynb against Alfalfa (PR #631)
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
@@ -27,11 +28,15 @@ jobs:
       - name: Install dependencies
         run: poetry install --no-interaction
 
-      - name: Start Alfalfa (ghcr develop images)
+      # TODO: pin back to `develop` once NatLabRockies/alfalfa#631 is merged.
+      # https://github.com/NatLabRockies/alfalfa/pull/631 fixes Modelica
+      # advance() writing the entire output dict to each point instead of
+      # its scalar value, which this notebook's FMU run depends on.
+      - name: Start Alfalfa (ghcr PR #631 images)
         uses: NatLabRockies/alfalfa-action@v1
         with:
-          tag: develop
-          compose-file-ref: develop
+          tag: fix-modelica-point-value-assignment
+          compose-file-ref: fix-modelica-point-value-assignment
           worker-scale: 2
 
       - name: Wait for Alfalfa web API
